@@ -1,6 +1,8 @@
 
 import React from 'react';
 import axios from 'axios';
+import {Form, Card} from 'react-bootstrap/';
+
 
 class App extends React.Component {
 
@@ -34,22 +36,24 @@ class App extends React.Component {
   render() {
   return (
    <div>
-     <form onSubmit={this.getLocation}>
+     <Form onSubmit={this.getLocation} style={{backgroundColor: 'orange', width:'250px' }}>
        <fieldset>
          <input type="text" placeholder="City" name="cityName"/>
        </fieldset>
        <fieldset>
          <button>Explor!</button>
        </fieldset>
-     </form>
+     </Form>
      <br/>
+     <Card style={{backgroundColor: 'lightGray'}}>
      <div showData={this.state.showData}>
-       <p>display_name: {this.state.resultData.display_name}</p>
-       <p>latitude: {this.state.resultData.lat}</p>
-       <p>longitude: {this.state.resultData.lon}</p>
+       <Card.Text>display_name: {this.state.resultData.display_name}</Card.Text>
+       <Card.Text>latitude: {this.state.resultData.lat}</Card.Text>
+       <Card.Text>longitude: {this.state.resultData.lon}</Card.Text>
        <br/>
-       <img src={this.state.mapLink} alt='map img' style={{width: '300px'}}/>
+       <Card.Img src={this.state.mapLink} alt='map img' style={{width: '300px'}}/>
      </div>
+     </Card>
    </div>
   );
   }
