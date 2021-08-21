@@ -26,8 +26,15 @@ class App extends React.Component {
     event.preventDefault();
    
     let resultData = await axios.get(`https://eu1.locationiq.com/v1/search.php?key=${process.env.REACT_APP_LOCATIONIQ_KEY}&q=${event.target.cityName.value}&format=json`);
-    let weatherData = await axios.get(`http://localhost:3001/weather?lat=${resultData.data[0].lat}&lon=${resultData.data[0].lon}&searchQuery=${resultData.data[0].display_name}`);
-    
+    let weatherData = {data: null};
+    try {
+      weatherData = await axios.get(`http://localhost:3001/weather?lat=${resultData.data[0].lat}&lon=${resultData.data[0].lon}&searchQuery=${resultData.data[0].display_name}`);
+    } catch(e) {
+      weatherData.data = 'error 500';
+    }
+
+    console.log(weatherData);
+
     this.setState({
       resultData: resultData.data[0],
       mapLink: `https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONIQ_KEY}&center=${resultData.data[0].lat},${resultData.data[0].lon}&zoom=18`,
@@ -59,12 +66,15 @@ class App extends React.Component {
      </div>
      </Card>
      {
-       this.state.weatherData.map((item, i) =>  {
+       this.state.weatherData !== undefined && this.state.weatherData !== null && typeof this.state.weatherData === 'object' && this.state.weatherData.map((item, i) =>  {
          return (
           <Weather key={i} description={item.description} date={item.date}></Weather>
          );
        })
      }
+     <Card hidden={this.state.weatherData === undefined || this.state.weatherData === null || typeof this.state.weatherData === 'object' }>
+       <Card.Text>Error: Something went wrong.</Card.Text>
+     </Card>
    </div>
   );
   }
