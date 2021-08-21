@@ -4,6 +4,7 @@ import axios from 'axios';
 import {Form, Card} from 'react-bootstrap/';
 import Weather from './components/Weather';
 import Movie from './components/Movie';
+import Resturant from './components/Resturant';
 
 
 class App extends React.Component {
@@ -20,7 +21,8 @@ class App extends React.Component {
       ],
       mapLink: '',
       weatherData: [],
-      movieData: []
+      movieData: [],
+      resturantData: []
     }
   }
 
@@ -30,24 +32,24 @@ class App extends React.Component {
     let resultData = await axios.get(`https://eu1.locationiq.com/v1/search.php?key=${process.env.REACT_APP_LOCATIONIQ_KEY}&q=${event.target.cityName.value}&format=json`);
     let weatherData = {data: null};
     let movieData = {data: null};
+    let resturantData = {data: null};
     try {
       weatherData = await axios.get(`https://alacityexplorerapi.herokuapp.com/weather?lat=${resultData.data[0].lat}&lon=${resultData.data[0].lon}&searchQuery=${resultData.data[0].display_name}`);
       movieData = await axios.get(`https://alacityexplorerapi.herokuapp.com/movies?searchQuery=${resultData.data[0].display_name.split(',')[0]}`);
+      resturantData = await axios.get(`https://alacityexplorerapi.herokuapp.com/yelp?searchQuery=${resultData.data[0].display_name.split(',')[0]}`);
     } catch(e) {
       weatherData.data = 'error 500';
       movieData.data = 'error 500';
+      resturantData.data = 'error 500';
     }
-
-    console.log(weatherData);
 
     this.setState({
       resultData: resultData.data[0],
       mapLink: `https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONIQ_KEY}&center=${resultData.data[0].lat},${resultData.data[0].lon}&zoom=18`,
       weatherData: weatherData.data,
-      movieData: movieData.data
+      movieData: movieData.data,
+      resturantData: resturantData.data
     });
-    console.log(this.state.weatherData);
-    
   }
 
   render() {
@@ -90,6 +92,16 @@ class App extends React.Component {
      }
      <Card hidden={this.state.movieData === undefined || this.state.movieData === null || typeof this.state.movieData === 'object' }>
        <Card.Text>Error: No movies found or error occured.</Card.Text>
+     </Card>
+     {
+       this.state.resturantData !== undefined && this.state.resturantData !== null && typeof this.state.resturantData === 'object' && this.state.resturantData.map((item, i) =>  {
+        return (
+         <Resturant key={i} name={item.name} image_url={item.image_url} price={item.price} rating={item.rating} url={item.url}></Resturant>
+        );
+      })
+     }
+     <Card hidden={this.state.resturantData === undefined || this.state.resturantData === null || typeof this.state.resturantData === 'object' }>
+       <Card.Text>Error: No resturant found or error occured.</Card.Text>
      </Card>
    </div>
   );
