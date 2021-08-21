@@ -2,6 +2,7 @@
 import React from 'react';
 import axios from 'axios';
 import {Form, Card} from 'react-bootstrap/';
+import Weather from './components/Weather';
 
 
 class App extends React.Component {
@@ -16,8 +17,8 @@ class App extends React.Component {
           lon:''
         }
       ],
-      showData: false,
-      mapLink: ''
+      mapLink: '',
+      weatherData: []
     }
   }
 
@@ -25,12 +26,15 @@ class App extends React.Component {
     event.preventDefault();
    
     let resultData = await axios.get(`https://eu1.locationiq.com/v1/search.php?key=${process.env.REACT_APP_LOCATIONIQ_KEY}&q=${event.target.cityName.value}&format=json`);
-
-    await this.setState({
+    let weatherData = await axios.get(`http://localhost:3001/weather?lat=${resultData.data[0].lat}&lon=${resultData.data[0].lon}&searchQuery=${resultData.data[0].display_name}`);
+    
+    this.setState({
       resultData: resultData.data[0],
-      showData: true,
-      mapLink: `https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONIQ_KEY}&center=${resultData.data[0].lat},${resultData.data[0].lon}&zoom=18`
-    })
+      mapLink: `https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONIQ_KEY}&center=${resultData.data[0].lat},${resultData.data[0].lon}&zoom=18`,
+      weatherData: weatherData.data
+    });
+    console.log(this.state.weatherData);
+    
   }
 
   render() {
@@ -46,7 +50,7 @@ class App extends React.Component {
      </Form>
      <br/>
      <Card style={{backgroundColor: 'lightGray'}}>
-     <div showData={this.state.showData}>
+     <div>
        <Card.Text>display_name: {this.state.resultData.display_name}</Card.Text>
        <Card.Text>latitude: {this.state.resultData.lat}</Card.Text>
        <Card.Text>longitude: {this.state.resultData.lon}</Card.Text>
@@ -54,6 +58,13 @@ class App extends React.Component {
        <Card.Img src={this.state.mapLink} alt='map img' style={{width: '300px'}}/>
      </div>
      </Card>
+     {
+       this.state.weatherData.map((item, i) =>  {
+         return (
+          <Weather key={i} description={item.description} date={item.date}></Weather>
+         );
+       })
+     }
    </div>
   );
   }
