@@ -31,8 +31,8 @@ class App extends React.Component {
     let weatherData = {data: null};
     let movieData = {data: null};
     try {
-      weatherData = await axios.get(`http://localhost:3001/weather?lat=${resultData.data[0].lat}&lon=${resultData.data[0].lon}&searchQuery=${resultData.data[0].display_name}`);
-      movieData = await axios.get(`http://localhost:3001/movies?searchQuery=${resultData.data[0].display_name.split(',')[0]}`);
+      weatherData = await axios.get(`https://alacityexplorerapi.herokuapp.com/weather?lat=${resultData.data[0].lat}&lon=${resultData.data[0].lon}&searchQuery=${resultData.data[0].display_name}`);
+      movieData = await axios.get(`https://alacityexplorerapi.herokuapp.com/movies?searchQuery=${resultData.data[0].display_name.split(',')[0]}`);
     } catch(e) {
       weatherData.data = 'error 500';
       movieData.data = 'error 500';
