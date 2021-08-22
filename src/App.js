@@ -1,4 +1,3 @@
-
 import React from 'react';
 import axios from 'axios';
 import {Form, Card} from 'react-bootstrap/';
@@ -34,9 +33,12 @@ class App extends React.Component {
     let movieData = {data: null};
     let resturantData = {data: null};
     try {
-      weatherData = await axios.get(`https://alacityexplorerapi.herokuapp.com/weather?lat=${resultData.data[0].lat}&lon=${resultData.data[0].lon}&searchQuery=${resultData.data[0].display_name}`);
-      movieData = await axios.get(`https://alacityexplorerapi.herokuapp.com/movies?searchQuery=${resultData.data[0].display_name.split(',')[0]}`);
-      resturantData = await axios.get(`https://alacityexplorerapi.herokuapp.com/yelp?searchQuery=${resultData.data[0].display_name.split(',')[0]}`);
+
+      let cityName = this.getCityName(resultData.data[0].display_name);
+
+      weatherData = await axios.get(`https://alacityexplorerapi.herokuapp.com/weather?lat=${resultData.data[0].lat}&lon=${resultData.data[0].lon}&searchQuery=${cityName}`);
+      movieData = await axios.get(`https://alacityexplorerapi.herokuapp.com/movies?searchQuery=${cityName}`);
+      resturantData = await axios.get(`https://alacityexplorerapi.herokuapp.com/yelp?searchQuery=${cityName}`);
     } catch(e) {
       weatherData.data = 'error 500';
       movieData.data = 'error 500';
@@ -50,6 +52,20 @@ class App extends React.Component {
       movieData: movieData.data,
       resturantData: resturantData.data
     });
+  }
+
+  getCityName = display_name => {
+    let cityName = '';
+    let arr = display_name.split(',');
+    for(let i = 0; i < arr.length; i++) {
+      if (arr[i].charAt(0) === ' ')
+        arr[i] = arr[i].substring(1, arr[i].length());
+      if ((arr[i].charAt(0) >= 'a' && arr[i].charAt(0) <= 'z') || (arr[i].charAt(0) >= 'A' && arr[i].charAt(0) <= 'Z')) {
+        cityName = arr[i];
+        break;
+      }
+    }
+    return cityName;
   }
 
   render() {
